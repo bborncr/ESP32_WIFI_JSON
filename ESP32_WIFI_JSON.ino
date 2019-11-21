@@ -4,6 +4,8 @@
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 #include <GxIO/GxIO.h>
 
+#include "secrets.h"
+
 GxIO_Class io(SPI, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16); // arbitrary selection of 17, 16
 GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16), 4
 //#if defined (ESP8266)
@@ -14,8 +16,6 @@ GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16
 #include <WiFiClient.h>
 #include <WiFiClientSecure.h>
 
-const char* ssid     = "Wolverine";
-const char* password = "harmankardon";
 const int httpPort  = 80;
 const int httpsPort = 443;
 const char* fp_api_github_com = "35 85 74 EF 67 35 A7 CE 40 69 50 F3 C0 F6 80 CF 80 3B 2E 19";
