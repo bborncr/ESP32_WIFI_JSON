@@ -23,7 +23,7 @@ const char* fp_rawcontent     = "cc aa 48 48 66 46 0e 91 53 2c 9c 7c 23 2a b1 74
 #endif
 const char* host_rawcontent   = "raw.githubusercontent.com";
 const char* path_rawcontent   = "/bborncr/ESP32_WIFI_JSON/master/data/";
-const char* path_prenticedavid   = "/prenticedavid/MCUFRIEND_kbv/master/extras/bitmaps/";
+//const char* path_prenticedavid   = "/prenticedavid/MCUFRIEND_kbv/master/extras/bitmaps/";
 
 void showBitmapFrom_HTTP(const char* host, const char* path, const char* filename, int16_t x, int16_t y, bool with_color = true);
 void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filename, const char* fingerprint, int16_t x, int16_t y, bool with_color = true);
@@ -75,24 +75,13 @@ void setup()
   // Print the IP address
   Serial.println(WiFi.localIP());
 
-  drawBitmaps_other();
-
-  //drawBitmaps_test();
-  //drawBitmapsBuffered_test();
+  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sizetest.bmp", fp_rawcontent, 0, 0);
 
   Serial.println("GxEPD_WiFi_Example done");
 }
 
 void loop(void)
 {
-}
-
-void drawBitmaps_other()
-{
-  int16_t w2 = display.width() / 2;
-  int16_t h2 = display.height() / 2;
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sizetest.bmp", fp_rawcontent, w2 - 100, h2 - 160);
-  delay(2000);
 }
 
 static const uint16_t input_buffer_pixels = 640; // may affect performance
