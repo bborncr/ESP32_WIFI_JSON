@@ -22,7 +22,7 @@ const char fp_rawcontent[20]  = {0xcc, 0xaa, 0x48, 0x48, 0x66, 0x46, 0x0e, 0x91,
 const char* fp_rawcontent     = "cc aa 48 48 66 46 0e 91 53 2c 9c 7c 23 2a b1 74 4d 29 9d 33";
 #endif
 const char* host_rawcontent   = "raw.githubusercontent.com";
-const char* path_rawcontent   = "/ZinggJM/GxEPD2/master/extras/bitmaps/";
+const char* path_rawcontent   = "/bborncr/ESP32_WIFI_JSON/master/data/";
 const char* path_prenticedavid   = "/prenticedavid/MCUFRIEND_kbv/master/extras/bitmaps/";
 
 void showBitmapFrom_HTTP(const char* host, const char* path, const char* filename, int16_t x, int16_t y, bool with_color = true);
