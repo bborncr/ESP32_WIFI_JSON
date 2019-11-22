@@ -4,12 +4,19 @@
 
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 #include <GxIO/GxIO.h>
+
+// FreeFonts from Adafruit_GFX
+#include <Fonts/FreeMonoBold9pt7b.h>
+#include <Fonts/FreeMonoBold12pt7b.h>
+#include <Fonts/FreeMonoBold18pt7b.h>
+#include <Fonts/FreeMonoBold24pt7b.h>
+
 #include <ArduinoJson.h>
 
 #include "secrets.h"
 
 #define REQUEST_HOST "raw.githubusercontent.com"
-#define REQUEST_PATH "/bborncr/ESP32_WIFI_JSON/master/data/db.json"
+#define REQUEST_PATH "/bborncr/ESP32_WIFI_JSON/master/data/"
 
 GxIO_Class io(SPI, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16); // arbitrary selection of 17, 16
 GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16), 4
@@ -23,7 +30,7 @@ const int httpsPort = 443;
 const char* fp_rawcontent     = "cc aa 48 48 66 46 0e 91 53 2c 9c 7c 23 2a b1 74 4d 29 9d 33";
 
 const char* host_rawcontent   = "raw.githubusercontent.com";
-const char* path_rawcontent   = "/bborncr/ESP32_WIFI_JSON/master/data/db.json";
+const char* path_rawcontent   = "/bborncr/ESP32_WIFI_JSON/master/data/";
 
 void getDataFromHTTPS();
 void showBitmapFrom_HTTP(const char* host, const char* path, const char* filename, int16_t x, int16_t y, bool with_color = true);
@@ -76,8 +83,8 @@ void setup()
   // Print the IP address
   Serial.println(WiFi.localIP());
 
-  getDataFromHTTPS();
   //showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sizetest.bmp", fp_rawcontent, 0, 0);
+  getDataFromHTTPS();
 
   Serial.println("ESP32_WIFI_JSON done");
 }
@@ -148,6 +155,15 @@ void getDataFromHTTPS() {
   
   int fa051386_6059_43ed_b4ae_8933affdfda8_2_id = fa051386_6059_43ed_b4ae_8933affdfda8[2]["id"]; // 2
   int fa051386_6059_43ed_b4ae_8933affdfda8_2_update = fa051386_6059_43ed_b4ae_8933affdfda8[2]["update"]; // 0
+  const char* name = "FreeMonoBold9pt7b";
+  const GFXfont* f = &FreeMonoBold9pt7b;
+  display.fillScreen(GxEPD_WHITE);
+  display.setTextColor(GxEPD_BLACK);
+  display.setRotation(1);
+  display.setFont(f);
+  display.setCursor(10, 20);
+  display.println(fa051386_6059_43ed_b4ae_8933affdfda8_1_amount);
+  display.update();
 
 }
 
