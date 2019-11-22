@@ -1,10 +1,15 @@
+#define ARDUINOJSON_DECODE_UNICODE 1
 #include <GxEPD.h>
 #include <GxGDEW029Z10/GxGDEW029Z10.h>    // 2.9" b/w/r
 
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 #include <GxIO/GxIO.h>
+#include <ArduinoJson.h>
 
 #include "secrets.h"
+
+#define REQUEST_HOST "raw.githubusercontent.com"
+#define REQUEST_PATH "/bborncr/ESP32_WIFI_JSON/master/data/db.json"
 
 GxIO_Class io(SPI, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16); // arbitrary selection of 17, 16
 GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16), 4
@@ -14,17 +19,13 @@ GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16
 
 const int httpPort  = 80;
 const int httpsPort = 443;
-const char* fp_api_github_com = "35 85 74 EF 67 35 A7 CE 40 69 50 F3 C0 F6 80 CF 80 3B 2E 19";
-const char* fp_github_com     = "ca 06 f5 6b 25 8b 7a 0d 4f 2b 05 47 09 39 47 86 51 15 19 84";
-#if USE_BearSSL
-const char fp_rawcontent[20]  = {0xcc, 0xaa, 0x48, 0x48, 0x66, 0x46, 0x0e, 0x91, 0x53, 0x2c, 0x9c, 0x7c, 0x23, 0x2a, 0xb1, 0x74, 0x4d, 0x29, 0x9d, 0x33};
-#else
-const char* fp_rawcontent     = "cc aa 48 48 66 46 0e 91 53 2c 9c 7c 23 2a b1 74 4d 29 9d 33";
-#endif
-const char* host_rawcontent   = "raw.githubusercontent.com";
-const char* path_rawcontent   = "/bborncr/ESP32_WIFI_JSON/master/data/";
-//const char* path_prenticedavid   = "/prenticedavid/MCUFRIEND_kbv/master/extras/bitmaps/";
 
+const char* fp_rawcontent     = "cc aa 48 48 66 46 0e 91 53 2c 9c 7c 23 2a b1 74 4d 29 9d 33";
+
+const char* host_rawcontent   = "raw.githubusercontent.com";
+const char* path_rawcontent   = "/bborncr/ESP32_WIFI_JSON/master/data/db.json";
+
+void getDataFromHTTPS();
 void showBitmapFrom_HTTP(const char* host, const char* path, const char* filename, int16_t x, int16_t y, bool with_color = true);
 void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filename, const char* fingerprint, int16_t x, int16_t y, bool with_color = true);
 
@@ -32,7 +33,7 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println();
-  Serial.println("GxEPD_WiFi_Example");
+  Serial.println("ESP32_WIFI_JSON");
 
   display.init(115200);
 
@@ -75,13 +76,79 @@ void setup()
   // Print the IP address
   Serial.println(WiFi.localIP());
 
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sizetest.bmp", fp_rawcontent, 0, 0);
+  getDataFromHTTPS();
+  //showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sizetest.bmp", fp_rawcontent, 0, 0);
 
-  Serial.println("GxEPD_WiFi_Example done");
+  Serial.println("ESP32_WIFI_JSON done");
 }
 
 void loop(void)
 {
+}
+
+void getDataFromHTTPS() {
+  bool connection_ok = false;
+  WiFiClientSecure client;
+  client.setTimeout(10000);
+  Serial.println(F("Connecting to server..."));
+  if (!client.connect(host_rawcontent, 443)) {
+    Serial.println(F("Failed to connect to server"));
+    return;
+  }
+
+  // Send HTTP request
+  client.println(F("GET https://raw.githubusercontent.com/bborncr/ESP32_WIFI_JSON/master/data/db.json HTTP/1.0"));
+  client.println(F("Host: raw.githubusercontent.com"));
+  client.println(F("Connection: close"));
+  if (client.println() == 0) {
+    Serial.println(F("Failed to send request"));
+    return;
+  }
+
+  // Check HTTP status
+  char status[32] = {0};
+  client.readBytesUntil('\r', status, sizeof(status));
+  // It should be "HTTP/1.0 200 OK" or "HTTP/1.1 200 OK"
+  if (strcmp(status + 9, "200 OK") != 0) {
+    Serial.print(F("Unexpected response: "));
+    Serial.println(status);
+    return;
+  }
+
+  // Skip HTTP headers
+  char endOfHeaders[] = "\r\n\r\n";
+  if (!client.find(endOfHeaders)) {
+    Serial.println(F("Invalid response"));
+    return;
+  }
+
+  Serial.println(F("Receive response..."));
+
+  const size_t capacity = JSON_ARRAY_SIZE(3) + JSON_OBJECT_SIZE(1) + 3 * JSON_OBJECT_SIZE(2) + 100;
+  DynamicJsonDocument doc(capacity);
+  // Parse JSON object
+  DeserializationError error = deserializeJson(doc, client);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.c_str());
+    return;
+  }
+
+  JsonArray fa051386_6059_43ed_b4ae_8933affdfda8 = doc["fa051386-6059-43ed-b4ae-8933affdfda8"];
+
+  int fa051386_6059_43ed_b4ae_8933affdfda8_0_id = fa051386_6059_43ed_b4ae_8933affdfda8[0]["id"]; // 0
+  const char* fa051386_6059_43ed_b4ae_8933affdfda8_0_amount = fa051386_6059_43ed_b4ae_8933affdfda8[0]["amount"]; // "c13,400.00"
+  Serial.print("amount colones:");
+  Serial.println(fa051386_6059_43ed_b4ae_8933affdfda8_0_amount);
+  
+  int fa051386_6059_43ed_b4ae_8933affdfda8_1_id = fa051386_6059_43ed_b4ae_8933affdfda8[1]["id"]; // 1
+  const char* fa051386_6059_43ed_b4ae_8933affdfda8_1_amount = fa051386_6059_43ed_b4ae_8933affdfda8[1]["amount"]; // "$32.95"
+  Serial.print("amount dolares:");
+  Serial.println(fa051386_6059_43ed_b4ae_8933affdfda8_1_amount);
+  
+  int fa051386_6059_43ed_b4ae_8933affdfda8_2_id = fa051386_6059_43ed_b4ae_8933affdfda8[2]["id"]; // 2
+  int fa051386_6059_43ed_b4ae_8933affdfda8_2_update = fa051386_6059_43ed_b4ae_8933affdfda8[2]["update"]; // 0
+
 }
 
 static const uint16_t input_buffer_pixels = 640; // may affect performance
