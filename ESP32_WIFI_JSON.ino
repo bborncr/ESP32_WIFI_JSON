@@ -83,7 +83,7 @@ void setup()
   // Print the IP address
   Serial.println(WiFi.localIP());
 
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "baclogo296x128.bmp", fp_rawcontent, 0, 0);
+  //showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sizetest.bmp", fp_rawcontent, 0, 0);
   getDataFromHTTPS();
 
   Serial.println("ESP32_WIFI_JSON done");
@@ -103,7 +103,7 @@ void getDataFromHTTPS() {
     return;
   }
 
-  // Send HTTP request
+  // Send HTTPS request
   client.println(F("GET https://raw.githubusercontent.com/bborncr/ESP32_WIFI_JSON/master/data/db.json HTTP/1.0"));
   client.println(F("Host: raw.githubusercontent.com"));
   client.println(F("Connection: close"));
